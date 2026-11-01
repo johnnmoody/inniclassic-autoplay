@@ -280,7 +280,7 @@ public class AudioPlayerManager {
                     } else {
                         if (main.currentIndex < main.currentPlaylist.size() - 1) {
                             nextTrack();
-                        } else {
+                        } else if (!playAutoplayNext(main)) {
                             main.currentIndex = 0;
                             prepareMusicTrack(main.currentIndex);
                             main.isPausedByHand = true;
@@ -290,6 +290,26 @@ public class AudioPlayerManager {
                 } catch (Exception e) { nextTrack(); }
             }
         });
+    }
+
+    // Autoplay (InniSync): at the end of the queue, add the song that goes best with the one that just
+    // finished and keep playing. Off unless "autoplay" is set; never for audiobooks or podcasts.
+    private boolean playAutoplayNext(MainActivity main) {
+        if (!main.prefs.getBoolean("autoplay", false) || main.isAudiobookLibraryMode) return false;
+        if (main.currentIndex < 0 || main.currentIndex >= main.currentPlaylist.size()) return false;
+        File finished = main.currentPlaylist.get(main.currentIndex);
+        String path = finished.getAbsolutePath();
+        if (path.contains("/Audiobooks") || path.contains("/Podcasts")) return false;
+        File next = Autoplay.pick(finished, main.currentPlaylist);
+        if (next == null) return false;
+        main.currentPlaylist.add(next);
+        main.originalPlaylist.add(next);
+        isGaplessQueueActive = false;   // one track at a time from here: the queue keeps growing
+        main.currentIndex = main.currentPlaylist.size() - 1;
+        main.isPausedByHand = false;
+        prepareMusicTrack(main.currentIndex);
+        main.updatePlayerUI();
+        return true;
     }
 
     private void handleTrackError(String errorMsg) {

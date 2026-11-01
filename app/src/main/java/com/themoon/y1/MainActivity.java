@@ -5960,6 +5960,23 @@ public class MainActivity extends Activity {
         });
         containerSettingsItems.addView(btnSoundCheck);
 
+        // Autoplay (InniSync): when the queue ends, keep playing songs that go with the last one.
+        // The matches come from InniSync on the computer, which writes them to the SD card on every sync.
+        final LinearLayout btnAutoplay = createSettingRow("Autoplay", prefs.getBoolean("autoplay", false) ? t("ON") : t("OFF"));
+        btnAutoplay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clickFeedback();
+                boolean on = !prefs.getBoolean("autoplay", false);
+                prefs.edit().putBoolean("autoplay", on).commit();
+                ((TextView) btnAutoplay.getChildAt(1)).setText(on ? t("ON") : t("OFF"));
+                if (on && !com.themoon.y1.managers.Autoplay.MAP_FILE.exists()) {
+                    Toast.makeText(MainActivity.this, t("Sync with InniSync to get Autoplay matches."), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        containerSettingsItems.addView(btnAutoplay);
+
         // 🚀 [신규 추가] Video: 화면비를 유지한 채(레터박스) 보여줄지, 화면을 완전히 채울지(원본 비율에
         // 따라 눌리거나 늘어날 수 있음) 선택 - GitHub Issue #7에서 직접 요청받은 기능.
         final boolean videoStretchFill = prefs.getBoolean("video_stretch_fill", false);
@@ -13532,6 +13549,7 @@ public class MainActivity extends Activity {
                     .remove("time_in_title_bar")
                     .remove("volume_limit_max")
                     .remove("sound_check_enabled")
+                    .remove("autoplay")
                     .remove("video_stretch_fill")
                     .remove("album_tilt_enabled")
                     .remove("backlight_timer_index")

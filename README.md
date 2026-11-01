@@ -1,3 +1,16 @@
+# InniClassic Autoplay
+
+A small change to [InniClassic](https://github.com/FabianZettl/inniclassic) 1.4.5 for use with InniSync, a desktop
+companion for the Innioasis Y1. When the queue ends (repeat off), it keeps playing songs that go with the last one,
+using the matches InniSync writes to `/storage/sdcard0/.innisync_autoplay.json` on every sync. Turn it on in
+Settings > Autoplay. It installs beside the original InniClassic (package `com.themoon.y1.autoplay`).
+
+The changes: `managers/Autoplay.java` (new), `playAutoplayNext` in `AudioPlayerManager.java`, the Autoplay row in
+`MainActivity.java`'s settings, and the package name and label in `app/build.gradle` and `strings.xml`.
+InniClassic's own license applies: free for personal, non-commercial use. Everything below is InniClassic's README.
+
+---
+
 # InniClassic
 
 <p align="center">
